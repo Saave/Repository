@@ -84,8 +84,8 @@
             this.helpToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.tsLabelGenerations = new System.Windows.Forms.ToolStripStatusLabel();
-            this.gPanel = new Saavedra_Carlos_Gol.GraphicsPanel();
             this.tsLabelMouse = new System.Windows.Forms.ToolStripStatusLabel();
+            this.gPanel = new Saavedra_Carlos_Gol.GraphicsPanel();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -551,6 +551,12 @@
             this.tsLabelGenerations.Name = "tsLabelGenerations";
             this.tsLabelGenerations.Size = new System.Drawing.Size(0, 17);
             // 
+            // tsLabelMouse
+            // 
+            this.tsLabelMouse.Name = "tsLabelMouse";
+            this.tsLabelMouse.Size = new System.Drawing.Size(32, 17);
+            this.tsLabelMouse.Text = "TSL2";
+            // 
             // gPanel
             // 
             this.gPanel.AutoScroll = true;
@@ -563,12 +569,7 @@
             this.gPanel.Size = new System.Drawing.Size(784, 562);
             this.gPanel.TabIndex = 1;
             this.gPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.gPanel_Paint);
-            // 
-            // tsLabelMouse
-            // 
-            this.tsLabelMouse.Name = "tsLabelMouse";
-            this.tsLabelMouse.Size = new System.Drawing.Size(32, 17);
-            this.tsLabelMouse.Text = "TSL2";
+            this.gPanel.MouseClick += new System.Windows.Forms.MouseEventHandler(this.gPanel_MouseClick);
             // 
             // Form1
             // 

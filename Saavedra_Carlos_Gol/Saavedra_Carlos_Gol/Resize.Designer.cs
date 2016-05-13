@@ -57,7 +57,7 @@
             0,
             0});
             this.rowsNUD.Minimum = new decimal(new int[] {
-            10,
+            18,
             0,
             0,
             0});
@@ -65,7 +65,7 @@
             this.rowsNUD.Size = new System.Drawing.Size(66, 20);
             this.rowsNUD.TabIndex = 1;
             this.rowsNUD.Value = new decimal(new int[] {
-            10,
+            18,
             0,
             0,
             0});
@@ -103,8 +103,13 @@
             // columnsNUD
             // 
             this.columnsNUD.Location = new System.Drawing.Point(93, 47);
+            this.columnsNUD.Maximum = new decimal(new int[] {
+            120,
+            0,
+            0,
+            0});
             this.columnsNUD.Minimum = new decimal(new int[] {
-            10,
+            18,
             0,
             0,
             0});
@@ -112,7 +117,7 @@
             this.columnsNUD.Size = new System.Drawing.Size(66, 20);
             this.columnsNUD.TabIndex = 6;
             this.columnsNUD.Value = new decimal(new int[] {
-            10,
+            18,
             0,
             0,
             0});

@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Celula.cs" />
     <Compile Include="GraphicsPanel.cs">
       <SubType>Component</SubType>
     </Compile>
