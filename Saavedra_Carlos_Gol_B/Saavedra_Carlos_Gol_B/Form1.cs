@@ -7,19 +7,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 
 namespace Saavedra_Carlos_Gol_B
 {
     public partial class Form1 : Form
     {
-        bool[,] Universe = new bool[10, 10];
-        bool[,] scratchPad = new bool[10, 10];
-        Timer utime = new Timer();
+        const int rows = 90;
+        const int columns = 90;
+        bool[,] Universe = new bool[rows, columns];
+        bool[,] scratchPad = new bool[rows, columns];
+        Timer uTime = new Timer();
         int generationX = 0;
 
         public Form1()
         {
             InitializeComponent();
+            uTime.Tick += T_Tick;
+            Universe = new bool[rows, columns];
+            scratchPad = new bool[rows, columns];
         }
 
        
@@ -28,9 +34,9 @@ namespace Saavedra_Carlos_Gol_B
         {
             // GridFrame(e);
             SolidBrush greenBrush = new SolidBrush(Color.Green);
-            Pen p = new Pen(Color.Black, 2.0f);
+            Pen p = new Pen(Color.Gray, 1.0f);
 
-            Font font = new Font("Arial", 10.0f);
+            Font font = new Font("Arial", 5.0f);
 
             StringFormat stringFormat = new StringFormat();
             stringFormat.Alignment = StringAlignment.Center;
@@ -80,6 +86,22 @@ namespace Saavedra_Carlos_Gol_B
                 {
                     int countNegh = CountNeibors(cX, cY);
                     //dont change anything in the universe but turn tings on the scretch pad
+                    if (Universe[cX,cY] == true)
+                    {
+                        if (countNegh == 2 || countNegh == 3)
+                        { scratchPad[cX, cY] = true; }
+                        else
+                        { scratchPad[cX, cY] = false; }
+                        
+                    }
+                   else
+                    {
+                        if (countNegh == 3)
+                        { scratchPad[cX, cY] = true; }
+                        else
+                        { scratchPad[cX, cY] = false; }
+
+                    }
 
 
                 }
@@ -90,6 +112,7 @@ namespace Saavedra_Carlos_Gol_B
             bool[,] temp = Universe;
             Universe = scratchPad;
             scratchPad = temp;
+            scratchPad = new bool[rows, columns];
             // i also need to clean the scratchPad nested loop averything to false
 
 
@@ -258,6 +281,86 @@ namespace Saavedra_Carlos_Gol_B
 
         }
 
+        private void newToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            for (int y = 0; y <= Universe.GetLength(1)-1; y++)
+            {
+                for (int x = 0; x <= Universe.GetLength(0)-1; x++)
+                {
+                    Universe[x, y] = false;
+                }     
+            }
+            generationX = 0;
+            labelGenerations.Text = "Generations: " + generationX.ToString();
+            gPanel.Invalidate();
+        }
 
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void T_Tick(object sender, EventArgs e)
+        {
+            //Call next generation
+            generationX++;
+            NextGeneration();
+            labelGenerations.Text = "Generations: " + generationX.ToString();
+            // ?? show
+             gPanel.Invalidate();
+        }
+        private void playButton_Click(object sender, EventArgs e)
+        {
+            uTime.Interval = 100;
+            uTime.Enabled = true;
+           // uTime.Tick += T_Tick;
+        }
+
+        private void pauseButton_Click(object sender, EventArgs e)
+        {
+            uTime.Enabled = false;
+        }
+
+        private void nextButton_Click(object sender, EventArgs e)
+        {
+            NextGeneration();
+            gPanel.Invalidate();
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog save = new SaveFileDialog();
+            save.InitialDirectory = Application.StartupPath;
+            // Set up some filters to narrow down what file types we can save as
+            save.Filter = ".cell (cell files) |*.cell";
+
+            // This will open the standard "save" window
+            if (save.ShowDialog() == DialogResult.OK)
+            {
+                // Associate a stream with the filename they used
+               // FileStream stream = new FileStream(save.FileName, FileMode.Create);
+                StreamWriter writer = new StreamWriter(save.FileName);
+                StringBuilder tempStr = new StringBuilder();
+                for (int i = 0; i < Universe.GetLength(1); i++)
+                {
+                    for (int j = 0; j < Universe.GetLength(0); j++)
+                    {
+                        if (Universe[i, j] == true)
+                        { tempStr.Append('O'); }
+                        else
+                        { tempStr.Append('.'); }
+                    }
+                    
+                }
+                writer.WriteLine(tempStr);
+                writer.Close();
+                //stream.Close();
+            }
+        }
+
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
