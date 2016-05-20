@@ -340,19 +340,20 @@ namespace Saavedra_Carlos_Gol_B
                 // Associate a stream with the filename they used
                // FileStream stream = new FileStream(save.FileName, FileMode.Create);
                 StreamWriter writer = new StreamWriter(save.FileName);
-                StringBuilder tempStr = new StringBuilder();
+                
                 for (int i = 0; i < Universe.GetLength(1); i++)
                 {
+                    StringBuilder tempStr = new StringBuilder();
                     for (int j = 0; j < Universe.GetLength(0); j++)
                     {
-                        if (Universe[i, j] == true)
-                        { tempStr.Append('O'); }
-                        else
+                        if (Universe[j, i] == true)
                         { tempStr.Append('.'); }
+                        else
+                        { tempStr.Append('O'); }
                     }
-                    
+                    writer.WriteLine(tempStr);
                 }
-                writer.WriteLine(tempStr);
+               
                 writer.Close();
                 //stream.Close();
             }
@@ -360,7 +361,216 @@ namespace Saavedra_Carlos_Gol_B
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.Filter = "All Files|*.*|Cell|*.cell";
+            dlg.FilterIndex = 2;
 
+            if (DialogResult.OK == dlg.ShowDialog())
+            {
+                StreamReader reader = new StreamReader(dlg.FileName);
+
+                // Create a couple variables to calculate the width and height
+                // of the data in the file.
+                int maxWidth = 0;
+                int maxHeight = 0;
+                int yPos = 0;
+                // Iterate through the file once to get its size.
+                while (!reader.EndOfStream)
+                {
+                    // Read one row at a time.
+                    string row = reader.ReadLine();
+
+                    // If the row begins with '!' then it is a comment
+                    // and should be ignored.
+                    if (row[0] != 'O' && row[0] != '.')
+                    { /* ignoring*/ }
+                    // If the row is not a comment then it is a row of cells.
+                    // Increment the maxHeight variable for each row read.
+                    else
+                    {
+                        maxHeight++;
+                        // Get the length of the current row string
+                        // and adjust the maxWidth variable if necessary.
+                        maxWidth = row.Length;
+                    }
+                }
+                // Resize the current universe and scratchPad
+                // to the width and height of the file calculated above.
+                //newToolStripMenuItem_Click(sender, e);
+                Universe = new bool[maxWidth, maxHeight];
+                scratchPad = new bool[maxWidth, maxHeight];
+                // Reset the file pointer back to the beginning of the file.
+                reader.BaseStream.Seek(0, SeekOrigin.Begin);
+
+                // Iterate through the file again, this time reading in the cells.
+                while (!reader.EndOfStream)
+                {
+                    // Read one row at a time.
+                    string row = reader.ReadLine();
+                    
+                    // If the row begins with '!' then
+                    // it is a comment and should be ignored.
+                    if (row[0] != 'O' && row[0] != '.')
+                    { /* ignoring*/ }
+                    // If the row is not a comment then 
+                    // it is a row of cells and needs to be iterated through.
+                    else
+                    {
+                        for (int xPos = 0; xPos < row.Length; xPos++)
+                        {
+                            // If row[xPos] is a 'O' (capital O) then
+                            // set the corresponding cell in the universe to alive.
+                            if (row[xPos] == 'O')
+                            {
+                                scratchPad[xPos, yPos] = false;
+                            }
+                            if (row[xPos] == '.')
+                            {
+                                scratchPad[xPos, yPos] = true;
+                            }
+                           
+                          
+                            
+                        }
+                        // If row[xPos] is a '.' (period) then
+                        // set the corresponding cell in the universe to dead.
+                        yPos++;
+                    }
+                    
+                }
+
+                // Close the file.
+
+                reader.Close();
+                bool[,] temp = Universe;
+                Universe = scratchPad;
+                scratchPad = temp;
+                scratchPad = new bool[maxWidth, maxHeight];
+                gPanel.Invalidate();
+
+            }
+
+                // string[] chuncks = loadedData.Split(',');
+                //for (int i = 0; i < Universe.GetLength(1); i++)
+                //{
+                //    StringBuilder tempStr = new StringBuilder();
+                //    for (int j = 0; j < Universe.GetLength(0); j++)
+                //    {
+                //        if (Universe[j, i] == true)
+                //        {  }
+                //        else
+                //        {  }
+                //    }
+                //    //writer.WriteLine(tempStr);
+                // }
+
+            
+        }
+
+        private void printPreviewToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.Filter = "All Files|*.*|Cell|*.cell";
+            dlg.FilterIndex = 2;
+
+            if (DialogResult.OK == dlg.ShowDialog())
+            {
+                StreamReader reader = new StreamReader(dlg.FileName);
+
+                // Create a couple variables to calculate the width and height
+                // of the data in the file.
+                int maxWidth = 0;
+                int maxHeight = 0;
+                int yPos = 0;
+                // Iterate through the file once to get its size.
+                while (!reader.EndOfStream)
+                {
+                    // Read one row at a time.
+                    string row = reader.ReadLine();
+
+                    // If the row begins with '!' then it is a comment
+                    // and should be ignored.
+                    if (row[0] != 'O' && row[0] != '.')
+                    { /* ignoring*/ }
+                    // If the row is not a comment then it is a row of cells.
+                    // Increment the maxHeight variable for each row read.
+                    else
+                    {
+                        maxHeight++;
+                        // Get the length of the current row string
+                        // and adjust the maxWidth variable if necessary.
+                        maxWidth = row.Length;
+                    }
+                }
+                // Resize the current universe and scratchPad
+                // to the width and height of the file calculated above.
+                newToolStripMenuItem_Click(sender, e);
+                Universe = new bool[maxWidth, maxHeight];
+                scratchPad = new bool[maxWidth, maxHeight];
+                // Reset the file pointer back to the beginning of the file.
+                reader.BaseStream.Seek(0, SeekOrigin.Begin);
+
+                // Iterate through the file again, this time reading in the cells.
+                while (!reader.EndOfStream)
+                {
+                    // Read one row at a time.
+                    string row = reader.ReadLine();
+
+                    // If the row begins with '!' then
+                    // it is a comment and should be ignored.
+                    if (row[0] != 'O' && row[0] != '.')
+                    { /* ignoring*/ }
+                    // If the row is not a comment then 
+                    // it is a row of cells and needs to be iterated through.
+                    else
+                    {
+                        for (int xPos = 0; xPos < row.Length; xPos++)
+                        {
+                            // If row[xPos] is a 'O' (capital O) then
+                            // set the corresponding cell in the universe to alive.
+                            if (row[xPos] == 'O')
+                            {
+                                scratchPad[xPos, yPos] = false;
+                            }
+                            if (row[xPos] == '.')
+                            {
+                                scratchPad[xPos, yPos] = true;
+                            }
+
+
+
+                        }
+                        // If row[xPos] is a '.' (period) then
+                        // set the corresponding cell in the universe to dead.
+                        yPos++;
+                    }
+
+                }
+
+                // Close the file.
+
+                reader.Close();
+                bool[,] temp = Universe;
+                Universe = scratchPad;
+                scratchPad = temp;
+                scratchPad = new bool[maxWidth, maxHeight];
+                gPanel.Invalidate();
+
+            }
+
+            // string[] chuncks = loadedData.Split(',');
+            //for (int i = 0; i < Universe.GetLength(1); i++)
+            //{
+            //    StringBuilder tempStr = new StringBuilder();
+            //    for (int j = 0; j < Universe.GetLength(0); j++)
+            //    {
+            //        if (Universe[j, i] == true)
+            //        {  }
+            //        else
+            //        {  }
+            //    }
+            //    //writer.WriteLine(tempStr);
+            // }
         }
     }
 }
