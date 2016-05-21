@@ -13,19 +13,24 @@ namespace Saavedra_Carlos_Gol_B
 {
     public partial class Form1 : Form
     {
-        const int rows = 90;
-        const int columns = 90;
-        bool[,] Universe = new bool[rows, columns];
-        bool[,] scratchPad = new bool[rows, columns];
+        int rows = 90;
+        int columns = 90;
+        bool[,] Universe;
+        bool[,] scratchPad;
         Timer uTime = new Timer();
         int generationX = 0;
 
         public Form1()
         {
             InitializeComponent();
+
             uTime.Tick += T_Tick;
             Universe = new bool[rows, columns];
             scratchPad = new bool[rows, columns];
+            viewGridToolStripMenuItem.Checked = true;
+            neighborCountVisibleToolStripMenuItem.Checked = true;
+            labelGenerations.Text = "Generations: " + generationX.ToString();
+
         }
 
        
@@ -64,16 +69,22 @@ namespace Saavedra_Carlos_Gol_B
                     {
 
                     }
-
-                    // Draw Grid
+                   
+                    // Draw Grid  
+                    if(viewGridToolStripMenuItem.Checked)
                     e.Graphics.DrawRectangle(p, x, y, cellWidth, cellHeight);
 
 
                     int neigbors = CountNeibors(cX, cY);
-
-                    e.Graphics.DrawString(neigbors.ToString(), font, Brushes.Black,
-                        new RectangleF(x, y, cellWidth, cellHeight), stringFormat);
-
+                    // Draw neighborgs
+                    if (neighborCountVisibleToolStripMenuItem.Checked == true)
+                    {
+                        if (neigbors != 0)
+                        {
+                            e.Graphics.DrawString(neigbors.ToString(), font, Brushes.Black,
+                            new RectangleF(x, y, cellWidth, cellHeight), stringFormat);
+                        }
+                    }
                 }
             }
         }
@@ -324,6 +335,8 @@ namespace Saavedra_Carlos_Gol_B
         private void nextButton_Click(object sender, EventArgs e)
         {
             NextGeneration();
+            generationX++;
+            labelGenerations.Text = "Generations: " + generationX.ToString();
             gPanel.Invalidate();
         }
 
@@ -332,7 +345,7 @@ namespace Saavedra_Carlos_Gol_B
             SaveFileDialog save = new SaveFileDialog();
             save.InitialDirectory = Application.StartupPath;
             // Set up some filters to narrow down what file types we can save as
-            save.Filter = ".cell (cell files) |*.cell";
+            save.Filter = "All Files|*.*|Cell|*.cells";
 
             // This will open the standard "save" window
             if (save.ShowDialog() == DialogResult.OK)
@@ -347,9 +360,9 @@ namespace Saavedra_Carlos_Gol_B
                     for (int j = 0; j < Universe.GetLength(0); j++)
                     {
                         if (Universe[j, i] == true)
-                        { tempStr.Append('.'); }
-                        else
                         { tempStr.Append('O'); }
+                        else
+                        { tempStr.Append('.'); }
                     }
                     writer.WriteLine(tempStr);
                 }
@@ -362,7 +375,7 @@ namespace Saavedra_Carlos_Gol_B
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog dlg = new OpenFileDialog();
-            dlg.Filter = "All Files|*.*|Cell|*.cell";
+            dlg.Filter = "All Files|*.*|Cell|*.cells";
             dlg.FilterIndex = 2;
 
             if (DialogResult.OK == dlg.ShowDialog())
@@ -397,8 +410,8 @@ namespace Saavedra_Carlos_Gol_B
                 // Resize the current universe and scratchPad
                 // to the width and height of the file calculated above.
                 //newToolStripMenuItem_Click(sender, e);
-                Universe = new bool[maxWidth, maxHeight];
-                scratchPad = new bool[maxWidth, maxHeight];
+               // Universe = new bool[maxWidth, maxHeight];
+               // scratchPad = new bool[maxWidth, maxHeight];
                 // Reset the file pointer back to the beginning of the file.
                 reader.BaseStream.Seek(0, SeekOrigin.Begin);
 
@@ -420,11 +433,11 @@ namespace Saavedra_Carlos_Gol_B
                         {
                             // If row[xPos] is a 'O' (capital O) then
                             // set the corresponding cell in the universe to alive.
-                            if (row[xPos] == 'O')
+                            if (row[xPos] == '.')
                             {
                                 scratchPad[xPos, yPos] = false;
                             }
-                            if (row[xPos] == '.')
+                            if (row[xPos] == 'O')
                             {
                                 scratchPad[xPos, yPos] = true;
                             }
@@ -445,7 +458,7 @@ namespace Saavedra_Carlos_Gol_B
                 bool[,] temp = Universe;
                 Universe = scratchPad;
                 scratchPad = temp;
-                scratchPad = new bool[maxWidth, maxHeight];
+                //scratchPad = new bool[maxWidth, maxHeight];
                 gPanel.Invalidate();
 
             }
@@ -466,11 +479,11 @@ namespace Saavedra_Carlos_Gol_B
 
             
         }
-
+        // This is OPEN
         private void printPreviewToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog dlg = new OpenFileDialog();
-            dlg.Filter = "All Files|*.*|Cell|*.cell";
+            dlg.Filter = "All Files|*.*|Cell|*.cells";
             dlg.FilterIndex = 2;
 
             if (DialogResult.OK == dlg.ShowDialog())
@@ -528,11 +541,11 @@ namespace Saavedra_Carlos_Gol_B
                         {
                             // If row[xPos] is a 'O' (capital O) then
                             // set the corresponding cell in the universe to alive.
-                            if (row[xPos] == 'O')
+                            if (row[xPos] == '.')
                             {
                                 scratchPad[xPos, yPos] = false;
                             }
-                            if (row[xPos] == '.')
+                            if (row[xPos] == 'O')
                             {
                                 scratchPad[xPos, yPos] = true;
                             }
@@ -554,6 +567,8 @@ namespace Saavedra_Carlos_Gol_B
                 Universe = scratchPad;
                 scratchPad = temp;
                 scratchPad = new bool[maxWidth, maxHeight];
+                rows = maxWidth;
+                columns = maxHeight;
                 gPanel.Invalidate();
 
             }
@@ -571,6 +586,52 @@ namespace Saavedra_Carlos_Gol_B
             //    }
             //    //writer.WriteLine(tempStr);
             // }
+        }
+
+        private void viewGridToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (viewGridToolStripMenuItem.Checked == true)
+            {
+                viewGridToolStripMenuItem.Checked = false;
+            }
+            else
+            {
+                viewGridToolStripMenuItem.Checked = true;
+            }
+            gPanel.Invalidate();
+        }
+
+        private void headsUpVisibleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void neighborCountVisibleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (neighborCountVisibleToolStripMenuItem.Checked == true)
+            {
+                neighborCountVisibleToolStripMenuItem.Checked = false;
+            }
+            else
+            {
+                neighborCountVisibleToolStripMenuItem.Checked = true;
+            }
+            gPanel.Invalidate();
+        }
+
+        private void startToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            playButton_Click(sender, e);
+        }
+
+        private void pauseToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            pauseButton_Click(sender, e);
+        }
+
+        private void nextToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            nextButton_Click(sender, e);
         }
     }
 }
