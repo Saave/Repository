@@ -19,6 +19,9 @@ namespace Saavedra_Carlos_Gol_B
         bool[,] scratchPad;
         Timer uTime = new Timer();
         int generationX = 0;
+        int neighbors = 0;
+        int cellsAlive;
+        bool runToDialog = false;
 
         public Form1()
         {
@@ -28,9 +31,10 @@ namespace Saavedra_Carlos_Gol_B
             Universe = new bool[rows, columns];
             scratchPad = new bool[rows, columns];
             viewGridToolStripMenuItem.Checked = true;
+            headsUpVisibleToolStripMenuItem.Checked = true;
             neighborCountVisibleToolStripMenuItem.Checked = true;
             labelGenerations.Text = "Generations: " + generationX.ToString();
-
+            cellsAlive=0;
         }
 
        
@@ -75,19 +79,42 @@ namespace Saavedra_Carlos_Gol_B
                     e.Graphics.DrawRectangle(p, x, y, cellWidth, cellHeight);
 
 
-                    int neigbors = CountNeibors(cX, cY);
+                    neighbors = CountNeibors(cX, cY);
                     // Draw neighborgs
                     if (neighborCountVisibleToolStripMenuItem.Checked == true)
                     {
-                        if (neigbors != 0)
+                        if (neighbors != 0)
                         {
-                            e.Graphics.DrawString(neigbors.ToString(), font, Brushes.Black,
+                            e.Graphics.DrawString(neighbors.ToString(), font, Brushes.Black,
                             new RectangleF(x, y, cellWidth, cellHeight), stringFormat);
                         }
                     }
+                    //Draw rectangle
+                   if (headsUpVisibleToolStripMenuItem.Checked == true)
+                   {
+                        HeadsUp( e);
+                   }
                 }
             }
         }
+
+        void HeadsUp( PaintEventArgs e)
+
+        {
+            Font fontR = new Font("Arial", 12.0f);
+            Pen p = new Pen(Color.BlueViolet, 2.0f);
+
+            StringFormat stFormat = new StringFormat();
+            stFormat.Alignment = StringAlignment.Near;
+            stFormat.LineAlignment = StringAlignment.Near;
+
+            Rectangle rect = new Rectangle(1,gPanel.Height-102, 130, gPanel.Height - 20);
+            
+            // e.Graphics.DrawRectangle(p, rect);
+            e.Graphics.DrawString("Generation: " + generationX.ToString() + "\nCells Alive: "+ cellsAlive.ToString(), fontR, Brushes.Blue, rect, stFormat);
+            //gPanel.Invalidate(); 
+        }
+
         void NextGeneration()
         {
             for (int cX = 0; cX < Universe.GetLength(0); cX++)
@@ -100,17 +127,31 @@ namespace Saavedra_Carlos_Gol_B
                     if (Universe[cX,cY] == true)
                     {
                         if (countNegh == 2 || countNegh == 3)
-                        { scratchPad[cX, cY] = true; }
+                        {
+                            scratchPad[cX, cY] = true;
+
+                        }
                         else
-                        { scratchPad[cX, cY] = false; }
+                        {
+                            scratchPad[cX, cY] = false;
+                            cellsAlive--;
+                        }
                         
                     }
                    else
                     {
                         if (countNegh == 3)
-                        { scratchPad[cX, cY] = true; }
+                        {
+
+                            scratchPad[cX, cY] = true;
+                            cellsAlive++;
+                        }
                         else
-                        { scratchPad[cX, cY] = false; }
+                        {
+                           
+                            scratchPad[cX, cY] = false;
+
+                        }
 
                     }
 
@@ -286,6 +327,14 @@ namespace Saavedra_Carlos_Gol_B
 
             // toggles the cell on/off
             Universe[x, y] = !Universe[x, y];
+            if (Universe[x, y])
+            {
+                cellsAlive++;
+            }
+            else
+            {
+                cellsAlive--;
+            }
 
             gPanel.Invalidate();
            
@@ -435,11 +484,12 @@ namespace Saavedra_Carlos_Gol_B
                             // set the corresponding cell in the universe to alive.
                             if (row[xPos] == '.')
                             {
-                                scratchPad[xPos, yPos] = false;
+                                Universe[xPos, yPos] = false;
                             }
                             if (row[xPos] == 'O')
                             {
-                                scratchPad[xPos, yPos] = true;
+                                Universe[xPos, yPos] = true;
+                                cellsAlive++;
                             }
                            
                           
@@ -455,9 +505,9 @@ namespace Saavedra_Carlos_Gol_B
                 // Close the file.
 
                 reader.Close();
-                bool[,] temp = Universe;
-                Universe = scratchPad;
-                scratchPad = temp;
+                //bool[,] temp = Universe;
+                //Universe = scratchPad;
+                scratchPad = Universe;
                 //scratchPad = new bool[maxWidth, maxHeight];
                 gPanel.Invalidate();
 
@@ -482,6 +532,8 @@ namespace Saavedra_Carlos_Gol_B
         // This is OPEN
         private void printPreviewToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            cellsAlive = 0;
+            newToolStripMenuItem_Click(sender, e);
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.Filter = "All Files|*.*|Cell|*.cells";
             dlg.FilterIndex = 2;
@@ -517,7 +569,7 @@ namespace Saavedra_Carlos_Gol_B
                 }
                 // Resize the current universe and scratchPad
                 // to the width and height of the file calculated above.
-                newToolStripMenuItem_Click(sender, e);
+                
                 Universe = new bool[maxWidth, maxHeight];
                 scratchPad = new bool[maxWidth, maxHeight];
                 // Reset the file pointer back to the beginning of the file.
@@ -548,6 +600,7 @@ namespace Saavedra_Carlos_Gol_B
                             if (row[xPos] == 'O')
                             {
                                 scratchPad[xPos, yPos] = true;
+                                cellsAlive++;
                             }
 
 
@@ -603,7 +656,15 @@ namespace Saavedra_Carlos_Gol_B
 
         private void headsUpVisibleToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+             if (headsUpVisibleToolStripMenuItem.Checked == true)
+            {
+                headsUpVisibleToolStripMenuItem.Checked = false;
+            }
+            else
+            {
+                headsUpVisibleToolStripMenuItem.Checked = true;
+            }
+            gPanel.Invalidate();
         }
 
         private void neighborCountVisibleToolStripMenuItem_Click(object sender, EventArgs e)
@@ -632,6 +693,19 @@ namespace Saavedra_Carlos_Gol_B
         private void nextToolStripMenuItem_Click(object sender, EventArgs e)
         {
             nextButton_Click(sender, e);
+        }
+
+        private void runToToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Run_To runTo = new Run_To();
+            runTo.ShowDialog();
+            for (int i = 0; i < runTo.Generation; i++)
+            {
+                nextButton_Click(sender, e);
+                generationX++;
+
+            }
+            gPanel.Invalidate();
         }
     }
 }
