@@ -13,15 +13,14 @@ namespace Saavedra_Carlos_Gol_B
 {
     public partial class Form1 : Form
     {
-        int rows = 90;
-        int columns = 90;
+        int rows = 36;
+        int columns = 36;
         bool[,] Universe;
         bool[,] scratchPad;
         Timer uTime = new Timer();
         int generationX = 0;
         int neighbors = 0;
         int cellsAlive;
-        bool runToDialog = false;
 
         public Form1()
         {
@@ -507,7 +506,7 @@ namespace Saavedra_Carlos_Gol_B
                 reader.Close();
                 //bool[,] temp = Universe;
                 //Universe = scratchPad;
-                scratchPad = Universe;
+                //scratchPad = Universe;
                 //scratchPad = new bool[maxWidth, maxHeight];
                 gPanel.Invalidate();
 
@@ -532,8 +531,6 @@ namespace Saavedra_Carlos_Gol_B
         // This is OPEN
         private void printPreviewToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            cellsAlive = 0;
-            newToolStripMenuItem_Click(sender, e);
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.Filter = "All Files|*.*|Cell|*.cells";
             dlg.FilterIndex = 2;
@@ -569,7 +566,7 @@ namespace Saavedra_Carlos_Gol_B
                 }
                 // Resize the current universe and scratchPad
                 // to the width and height of the file calculated above.
-                
+                newToolStripMenuItem_Click(sender, e);
                 Universe = new bool[maxWidth, maxHeight];
                 scratchPad = new bool[maxWidth, maxHeight];
                 // Reset the file pointer back to the beginning of the file.
@@ -695,17 +692,72 @@ namespace Saavedra_Carlos_Gol_B
             nextButton_Click(sender, e);
         }
 
-        private void runToToolStripMenuItem_Click(object sender, EventArgs e)
+        private void randomizeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Run_To runTo = new Run_To();
-            runTo.ShowDialog();
-            for (int i = 0; i < runTo.Generation; i++)
+            scratchPad = new bool[rows, columns];
+            Random rand = new Random();
+            for (int i = 0; i < columns; i++)
             {
-                nextButton_Click(sender, e);
-                generationX++;
+                for (int j = 0; j < rows; j++)
+                {
+
+                    if ((rand.Next(0, 100)) < 50)
+                    {
+                        scratchPad[j, i] = true;
+                    }
+
+                }
 
             }
+            Swap();
             gPanel.Invalidate();
+        }
+
+        private void Swap()
+        {
+            bool[,] temp = Universe;
+            Universe = scratchPad;
+            scratchPad = temp;
+            //scratchPad = new bool[rows, columns];
+            for (int i = 0; i < columns; i++)
+            {
+                for (int j = 0; j < rows; j++)
+                {
+
+                    {
+                        scratchPad[j, i] = false;
+                    }
+
+                }
+
+            }
+        }
+
+        private void resetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            rows = 36;
+            columns = 36;
+            Universe = new bool[rows, columns];
+            scratchPad = new bool[rows, columns];
+            viewGridToolStripMenuItem.Checked = true;
+            headsUpVisibleToolStripMenuItem.Checked = true;
+            neighborCountVisibleToolStripMenuItem.Checked = true;
+            labelGenerations.Text = "Generations: " + generationX.ToString();
+            cellsAlive = 0;
+            gPanel.Invalidate();
+
+        }
+
+        private void reloadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            
+            Universe = new bool[rows, columns];
+            scratchPad = new bool[rows, columns];
+            viewGridToolStripMenuItem.Checked = true;
+            headsUpVisibleToolStripMenuItem.Checked = true;
+            neighborCountVisibleToolStripMenuItem.Checked = true;
+            labelGenerations.Text = "Generations: " + generationX.ToString();
+            cellsAlive = 0;
         }
     }
 }
